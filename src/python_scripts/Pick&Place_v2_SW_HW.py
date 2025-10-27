@@ -80,6 +80,7 @@ def main():
     Init()
     Pick()
     Place()
+    Init()
 
 if __name__ == "__main__":
     main()
