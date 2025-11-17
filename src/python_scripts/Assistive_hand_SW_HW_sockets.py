@@ -1,8 +1,6 @@
 import os
 import time
 import socket
-import tkinter as tk
-from tkinter import messagebox
 from math import radians, degrees, pi
 import numpy as np
 from robodk.robolink import *
@@ -12,7 +10,11 @@ from robodk.robomath import *
 relative_path = "src/roboDK/Assistive_UR5e.rdk"
 absolute_path = os.path.abspath(relative_path)
 RDK = Robolink()
+print("Loading RoboDK...")
+time.sleep(2)
 RDK.AddFile(absolute_path)
+print("Loading RoboDK Project...")
+time.sleep(2)
 
 # Robot setup
 robot = RDK.Item("UR5e")
@@ -73,7 +75,7 @@ def Init():
     print("Init")
     robot.MoveL(Init_target, True)
     print("Init_target REACHED")
-    if robot_is_connected:
+    if robot_is_connected and ur5e_execution:
         print("Init REAL UR5e")
         send_ur_script(set_tcp)
         receive_response(1)
@@ -90,7 +92,7 @@ def Hand_shake():
     robot.MoveL(Shake_target, True)
     robot.MoveL(App_shake_target, True)
     print("Hand Shake FINISHED")
-    if robot_is_connected:
+    if robot_is_connected and ur5e_execution:
         print("App_shake REAL UR5e")
         send_ur_script(set_tcp)
         receive_response(1)
@@ -109,7 +111,7 @@ def Give_me_5():
     robot.MoveL(Give5_target, True)
     robot.MoveL(App_give5_target, True)
     print("Give me 5! FINISHED")
-    if robot_is_connected:
+    if robot_is_connected and ur5e_execution:
         print("Give5 REAL UR5e")
         send_ur_script(set_tcp)
         receive_response(1)
@@ -120,34 +122,19 @@ def Give_me_5():
         send_ur_script(movel_app_give5)
         receive_response(timel)
 
-# Confirmation dialog to close RoboDK
-def confirm_close():
-    root = tk.Tk()
-    root.withdraw()
-    response = messagebox.askquestion(
-        "Close RoboDK",
-        "Do you want to save changes before closing RoboDK?",
-        icon='question'
-    )
-    if response == 'yes':
-        RDK.Save()
-        RDK.CloseRoboDK()
-        print("RoboDK saved and closed.")
-    else:
-        RDK.CloseRoboDK()
-        print("RoboDK closed without saving.")
-
 # Main function
 def main():
-    global robot_is_connected
+    global robot_is_connected, ur5e_execution
+    ur5e_execution = False # Flag for UR5e execution. Only one group at True at a time.
     robot_is_connected = check_robot_port(ROBOT_IP, ROBOT_PORT)
     Init()
     Hand_shake()
     Give_me_5()
+    Init()
     if robot_is_connected:
         robot_socket.close()
 
 # Run and close
 if __name__ == "__main__":
     main()
-    #confirm_close()
+    #RDK.CloseRoboDK()

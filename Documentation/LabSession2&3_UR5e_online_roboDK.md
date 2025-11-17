@@ -2,7 +2,7 @@
 
 ## ROBOTICS AND CONTROL OF BIOMEDICAL SYSTEMS
 ### Robotic arm Universal Robot UR5e
-### Laboratory session 2: UR5e Social/Assistive robotic task design
+### Laboratory session 2&3: UR5e Social/Assistive robotic task design
 
 ---
 
@@ -16,7 +16,7 @@ Simulation (Off-line programming) is an interesting tool enabling the robot task
 
 This session has a previous task to be delivered at the beginning of the session.
 
-## **1. Simple Social task**
+## **1. Simple task**
 The **Task** is the design of challenging assistive robotic tasks with the UR5e robotic arm and the offline simulation using Graphical scripting and Python code integrated into RoboDK.
 
 ![RoboDK interface](Images/Session2/figure2.png)
@@ -55,18 +55,11 @@ This gives you the program in absolute coordinates (with respect to the UR5e bas
 Save the programs on a pen-drive and execute them directly on Polyscope.
 
 ### **2.2. RoboDK online programming**
-RoboDK can be connected to the real robot arm with an internet cable in a local network.
+Laboratory PCs are connected to the UR5e robot arm with a local network.
 
-To proceed you have to:
-1.  Connect the computer to the UR5e robot with an ethernet cable.
-2.  Fix the IP address on the PC (Network and Internet > Change adapter options > Ethernet properties > TCP/IPv4 protocol).
-3.  Fix an IP for the UR5e: `manual mode > settings > network > specify IP and subnet mask`.
-4.  Set the Teach Pendant to automatic mode and then select “Remote control”.
-5.  Disable the firewall (Public network).
+Any program can be executed simultaneously in RoboDK simulation and in the real UR5e robot arm.
 
-![Ethernet connection](Images/Session2/figure5.png)
-
-#### Execution using “Menu-bar” options
+#### a) Execution using “Menu-bar” options
 In this case you need to:
 1.  Select “run on robot” (right-click on the program and all subprograms!).
 2.  Connect to the UR5e robot (right-click on the robot).
@@ -78,7 +71,7 @@ When you run the “MainProgram”, the real robot moves simultaneously with the
 
 Run the pick & place program from RoboDK and the real UR5 robot will perform the movements.
 
-#### Execution within python code
+#### b) Execution within python code
 You can create a python code to fully control the simple task `Assistive_hand_SW.py` process. The options you have selected in the “Menu-bar” have their specific function in the RoboDK library:
 - You only have to add a function to choose between Software (SW) or Hardware (HW) execution.
 
@@ -154,17 +147,22 @@ During the first hour of the laboratory session, students will see a demonstrati
 During the second hour, students will adapt and generate the proper and obtimised code for their Social-Assistive designed task. 
 
 **Suggestions**: 
-- You can improve and automate your code if you use:
-    - For moveJ:
+- You can improve and automate your code if you use (Recommendation):
+    - For movej usually:
         ```python
         j1, j2, j3, j4, j5, j6 = np.radians(Target.Joints()).tolist()[0]
         movej_Target = f"movej([{j1},{j2}, {j3}, {j4}, {j5}, {j6}],{accel_mss},{speed_ms},{time_high},{blend_r})"
         ```
-    - For moveL:
+    - For moveL usually (URScript uses meters and angle-vector in radians):
         ```python
-        X, Y, Z, Roll, Pitch, Yaw = Pose_2_TxyzRxyz(Target.Pose())
-        movel_Target = f"movel(p[{X}, {Y}, {Z}, {Roll}, {Pitch}, {Yaw}], a={accel_mss}, v={speed_ms}, t={timel}, r={blend_r})"
+        X, Y, Z, u, v, w = Pose_2_UR(Target.Pose())
+        movel_Target = f"movel(p[{X/1000}, {Y/1000}, {Z/1000}, {u}, {v}, {w}], a={accel_mss}, v={speed_ms}, t={timel}, r={blend_r})"
         ````
+    - `Recommendation!`:
+        ```python
+        j1, j2, j3, j4, j5, j6 = np.radians(Target.Joints()).tolist()[0]
+        movej_Target = f"movel([{j1},{j2}, {j3}, {j4}, {j5}, {j6}],{accel_mss},{speed_ms},{time_high},{blend_r})"
+        ```
 - Try an OOP approach with a class RobotUR5e with atributes and methods.
 
 **Objectives:**
